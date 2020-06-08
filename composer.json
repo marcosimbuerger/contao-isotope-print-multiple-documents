@@ -1,0 +1,33 @@
+{
+    "name": "marcosimbuerger/contao-isotope-print-multiple-documents",
+    "description": "Print functionality for multiple documents for Contao Isotope eCommerce.",
+    "keywords": ["contao", "isotope", "ecommerce", "documents", "print", "multiple"],
+    "type": "contao-bundle",
+    "license": "LGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Marco Simbürger",
+            "homepage": "https://www.marcosimbuerger.ch"
+        }
+    ],
+    "require": {
+        "php": "^7.2",
+        "contao/core-bundle": "^4.4",
+        "isotope/isotope-core": "^2.0"
+    },
+    "conflict": {
+        "contao/core": "*",
+        "contao/manager-plugin": "<2.0 || >=3.0"
+    },
+    "extra": {
+        "contao-manager-plugin": "MarcoSimbuerger\\IsotopePrintMultipleDocuments\\ContaoManager\\Plugin"
+    },
+    "autoload": {
+        "psr-4": {
+            "MarcoSimbuerger\\IsotopePrintMultipleDocuments\\": "src/"
+        },
+        "classmap": [
+            "src/"
+        ]
+    }
+}
