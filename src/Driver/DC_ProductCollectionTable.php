@@ -224,7 +224,7 @@ class DC_ProductCollectionTable extends DC_Table {
     protected function zipDocuments(array $documents): bool {
         /** @var \ZipArchive $zip */
         $zip = new \ZipArchive;
-        $result = $zip->open($this->getZipFilePath(), \ZipArchive::CREATE);
+        $result = $zip->open($this->getZipFilePath(), \ZipArchive::OVERWRITE);
         if ($result === TRUE) {
             foreach ($documents as $document) {
                 $zip->addFile($document, basename($document));
