@@ -2,12 +2,18 @@
 
 // Not using a namespace here, because Contao needs to find this class in the classmap.
 
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\DC_Table;
+use Contao\Environment;
+use Contao\Input;
+use Contao\Message;
 use Contao\SelectMenu;
 use Contao\StringUtil;
+use Contao\System;
 use Isotope\Frontend;
 use Isotope\Model\Document;
 use Isotope\Model\ProductCollection\Order;
+use Psr\Log\LogLevel;
 
 /**
  * Class DC_ProductCollectionTable.
@@ -40,7 +46,31 @@ class DC_ProductCollectionTable extends DC_Table {
      *
      * @var string
      */
-    protected const ZIP_FILE_NAME = 'all_documents.zip';
+    protected const ZIP_FILE_NAME = 'all_documents';
+
+    /**
+     * Zip error code map.
+     *
+     * @var array
+     */
+    protected const ZIP_ERRORS = [
+        ZipArchive::ER_EXISTS => 'File already exists.',
+        ZipArchive::ER_INCONS => 'Zip archive inconsistent.',
+        ZipArchive::ER_INVAL => 'Invalid argument.',
+        ZipArchive::ER_MEMORY => 'Malloc failure.',
+        ZipArchive::ER_NOENT => 'No such file.',
+        ZipArchive::ER_NOZIP => 'Not a zip archive.',
+        ZipArchive::ER_OPEN => 'Can not open file.',
+        ZipArchive::ER_READ => 'Read error.',
+        ZipArchive::ER_SEEK => 'Seek error.',
+    ];
+
+    /**
+     * The monolog logger.
+     *
+     * @var \Symfony\Bridge\Monolog\Logger
+     */
+    protected $logger;
 
     /**
      * The url of the current request.
@@ -57,14 +87,22 @@ class DC_ProductCollectionTable extends DC_Table {
     protected $redirectUrl;
 
     /**
+     * Zip file name.
+     *
+     * @var string
+     */
+    protected $zipFileName;
+
+    /**
      * {@inheritdoc}.
      */
     public function __construct($strTable, $arrModule = []) {
         parent::__construct($strTable, $arrModule);
 
-        $this->currentRequestUrl = \Environment::get('request');
+        $this->logger = System::getContainer()->get('monolog.logger.contao');
+        $this->currentRequestUrl = Environment::get('request');
 
-        if (\Input::post('FORM_SUBMIT') == 'tl_select') {
+        if (Input::post('FORM_SUBMIT') == 'tl_select') {
             if (isset($_POST[self::PRINT_ALL_DOCUMENTS_BUTTON_ID])) {
                 // Replace default 'select' action with 'print' action.
                 $this->redirect(str_replace('act=select', 'act=' . self::PRINT_ALL_DOCUMENTS_ACTION_NAME, $this->currentRequestUrl));
@@ -82,22 +120,26 @@ class DC_ProductCollectionTable extends DC_Table {
      *   Returns the document-type selection form.
      */
     public function printAllDocuments() {
-         $this->redirectUrl = $this->getRedirectUrl();
+        $this->redirectUrl = $this->getRedirectUrl();
 
         // If form id is available, the form has been sent.
-        if (\Input::post('FORM_SUBMIT') === self::PRINT_ALL_DOCUMENTS_FROM_ID) {
+        if (Input::post('FORM_SUBMIT') === self::PRINT_ALL_DOCUMENTS_FROM_ID) {
+            $this->generateZipFileName();
             $documents = $this->generateDocuments();
             if (!empty($documents)) {
                 if ($this->zipDocuments($documents) === TRUE) {
                     $this->sendZipToBrowser();
                 }
             }
+            else {
+                $this->logError('No documents have been created.', __FUNCTION__);
+            }
         }
         else {
             /** @var \Contao\SelectMenu $selectMenu */
             $selectMenu = $this->getDocumentTypeSelectMenu();
-            $messages = \Message::generate();
-            \Message::reset();
+            $messages = Message::generate();
+            Message::reset();
 
             // TODO: use better solution as this Contao default.
             // Return form.
@@ -145,7 +187,7 @@ class DC_ProductCollectionTable extends DC_Table {
             'eval' => ['mandatory' => TRUE]
         ];
 
-        return new \SelectMenu(\SelectMenu::getAttributesFromDca($selectData, $selectData['name']));
+        return new SelectMenu(SelectMenu::getAttributesFromDca($selectData, $selectData['name']));
     }
 
     /**
@@ -164,10 +206,18 @@ class DC_ProductCollectionTable extends DC_Table {
      *   The sessions ids.
      */
     protected function getSessionIds(): array {
-        /** @var Session $sessionObject */
-        $sessionObject = \System::getContainer()->get('session');
+        /** @var \Contao\Session $sessionObject */
+        $sessionObject = System::getContainer()->get('session');
         $session = $sessionObject->all();
         return $session['CURRENT']['IDS'];
+    }
+
+    /**
+     * Generate an unique zip file name.
+     */
+    protected function generateZipFileName(): void {
+        $timestamp = date('Ymd_Hisv', time());
+        $this->zipFileName = self::ZIP_FILE_NAME . '_' . $timestamp . '.zip';
     }
 
     /**
@@ -177,7 +227,7 @@ class DC_ProductCollectionTable extends DC_Table {
      *   The zip file path.
      */
     protected function getZipFilePath(): string {
-        return sys_get_temp_dir() . '/' . self::ZIP_FILE_NAME;
+        return sys_get_temp_dir() . '/' . $this->zipFileName;
     }
 
     /**
@@ -194,16 +244,18 @@ class DC_ProductCollectionTable extends DC_Table {
             // As done in \Isotope\Backend\ProductCollection\Callback::printDocument().
             /** @var \Isotope\Model\ProductCollection\Order $objOrder */
             if (($objOrder = Order::findByPk($id)) === NULL) {
-                \Message::addError('Could not find order id.');
-                \Controller::redirect($this->redirectUrl);
+                $message = 'Could not find order id.';
+                $this->logError($message, __FUNCTION__);
+                $this->printErrorMessageAndRedirect($message);
             }
 
             Frontend::loadOrderEnvironment($objOrder);
 
             /** @var \Isotope\Interfaces\IsotopeDocument $objDocument */
-            if (($objDocument = Document::findByPk(\Input::post('document'))) === NULL) {
-                \Message::addError('Could not find document id.');
-                \Controller::redirect($this->redirectUrl);
+            if (($objDocument = Document::findByPk(Input::post('document'))) === NULL) {
+                $message = 'Could not find document id.';
+                $this->logError($message, __FUNCTION__);
+                $this->printErrorMessageAndRedirect($message);
             }
 
             $documents[] = $objDocument->outputToFile($objOrder, sys_get_temp_dir());
@@ -224,7 +276,8 @@ class DC_ProductCollectionTable extends DC_Table {
     protected function zipDocuments(array $documents): bool {
         /** @var \ZipArchive $zip */
         $zip = new \ZipArchive;
-        $result = $zip->open($this->getZipFilePath(), \ZipArchive::OVERWRITE);
+
+        $result = $zip->open($this->getZipFilePath(), \ZipArchive::CREATE);
         if ($result === TRUE) {
             foreach ($documents as $document) {
                 $zip->addFile($document, basename($document));
@@ -232,6 +285,18 @@ class DC_ProductCollectionTable extends DC_Table {
             $zip->close();
 
             return TRUE;
+        }
+        else {
+            $message = 'Error while creating the zip file. Error: ';
+            if (isset(self::ZIP_ERRORS[$result])) {
+                $message .= self::ZIP_ERRORS[$result];
+            }
+            else {
+                $message .= 'Unknown error.';
+            }
+
+            $this->logError($message, __FUNCTION__);
+            $this->printErrorMessageAndRedirect($message);
         }
 
         return FALSE;
@@ -242,9 +307,36 @@ class DC_ProductCollectionTable extends DC_Table {
      */
     protected function sendZipToBrowser(): void {
         header('Content-Type: application/zip');
-        header('Content-disposition: attachment; filename=' . self::ZIP_FILE_NAME);
+        header('Content-disposition: attachment; filename=' . $this->zipFileName);
         header('Content-Length: ' . filesize($this->getZipFilePath()));
         readfile($this->getZipFilePath());
+    }
+
+    /**
+     * Log error message.
+     *
+     * @param string $message
+     *   The error message.
+     * @param string $functionName
+     *   The function name.
+     */
+    protected function logError(string $message, string $functionName): void {
+        $this->logger->log(
+            LogLevel::ERROR,
+            $message,
+            ['contao' => new ContaoContext(__CLASS__ . '::' . $functionName, TL_GENERAL)]
+        );
+    }
+
+    /**
+     * Print error message & redirect.
+     *
+     * @param string $message
+     *   The error message.
+     */
+    protected function printErrorMessageAndRedirect(string $message): void {
+        Message::addError($message);
+        Controller::redirect($this->redirectUrl);
     }
 
 }
