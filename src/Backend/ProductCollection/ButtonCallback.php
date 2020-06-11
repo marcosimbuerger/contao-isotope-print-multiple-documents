@@ -14,15 +14,15 @@ class ButtonCallback {
     /**
      * Add print button.
      *
-     * @param array $butttons
+     * @param array $buttons
      *   The buttons.
      *
      * @return array
      *   The edited buttons array.
      */
-    public function addPrintAllDocumentsButton(array $butttons) {
-        $butttons['print_all_documents'] = '<button type="submit" name="print_all_documents" id="print_all_documents" class="tl_submit">' . StringUtil::specialchars($GLOBALS['TL_LANG']['tl_iso_product_collection']['print']) . '</button> ';
-        return $butttons;
+    public function addPrintAllDocumentsButton(array $buttons): array {
+        $buttons['print_all_documents'] = '<button type="submit" name="print_all_documents" id="print_all_documents" class="tl_submit">' . StringUtil::specialchars($GLOBALS['TL_LANG']['tl_iso_product_collection']['print']) . '</button> ';
+        return $buttons;
     }
 
 }
