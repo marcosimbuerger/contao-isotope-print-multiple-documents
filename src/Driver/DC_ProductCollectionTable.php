@@ -148,7 +148,7 @@ class DC_ProductCollectionTable extends DC_Table {
  <a href="' . ampersand($this->redirectUrl) . '" class="header_back" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['backBT']) . '">' . $GLOBALS['TL_LANG']['MSC']['backBT'] . '</a>
 </div>
 
-<h2 class="sub_headline">' . $GLOBALS['TL_LANG']['tl_iso_product_collection']['print_document'][1] . '</h2>' . $messages . '
+<h2 class="sub_headline">' . $GLOBALS['TL_LANG']['tl_iso_product_collection']['print_all_documents'][0] . '</h2>' . $messages . '
 
 <form action="' . ampersand($this->currentRequestUrl, true) . '" id="' . self::PRINT_ALL_DOCUMENTS_FROM_ID . '" class="tl_form" method="post">
     <div class="tl_formbody_edit">
