@@ -310,6 +310,7 @@ class DC_ProductCollectionTable extends DC_Table {
         header('Content-disposition: attachment; filename=' . $this->zipFileName);
         header('Content-Length: ' . filesize($this->getZipFilePath()));
         readfile($this->getZipFilePath());
+        exit;
     }
 
     /**
