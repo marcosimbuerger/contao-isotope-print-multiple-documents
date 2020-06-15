@@ -306,10 +306,28 @@ class DC_ProductCollectionTable extends DC_Table {
      * Send the zip file to the browser.
      */
     protected function sendZipToBrowser(): void {
+        if (ob_get_contents() !== FALSE) {
+            $this->logError('Some data has already been output, can not send zip file', __FUNCTION__);
+        }
+
+        if (headers_sent() !== FALSE) {
+            $this->logError('Some data has already been output to the browser, can not send zip file', __FUNCTION__);
+        }
+
+        header('Pragma: public');
+        header('Expires: 0');
+        header('Cache-Control: private, must-revalidate, post-check=0, pre-check=0, max-age=1');
+        header('Content-Description: File Transfer');
         header('Content-Type: application/zip');
-        header('Content-disposition: attachment; filename=' . $this->zipFileName);
+        header('Content-Disposition: attachment; filename="' . basename($this->getZipFilePath()) . '"');
+        header('Content-Transfer-Encoding: binary');
         header('Content-Length: ' . filesize($this->getZipFilePath()));
-        readfile($this->getZipFilePath());
+
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        @readfile($this->getZipFilePath());
         exit;
     }
 
