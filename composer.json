@@ -13,7 +13,8 @@
     "require": {
         "php": "^7.2",
         "contao/core-bundle": "^4.4",
-        "isotope/isotope-core": "^2.0"
+        "isotope/isotope-core": "^2.0",
+        "marcosimbuerger/contao-data-container-extension": "^1.0"
     },
     "conflict": {
         "contao/core": "*",

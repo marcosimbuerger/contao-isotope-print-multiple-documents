@@ -1,9 +1,9 @@
 <?php
 
-// Not using a namespace here, because Contao needs to find this class in the classmap.
+namespace MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection;
 
+use Contao\Controller;
 use Contao\CoreBundle\Monolog\ContaoContext;
-use Contao\DC_Table;
 use Contao\Environment;
 use Contao\Input;
 use Contao\Message;
@@ -14,11 +14,14 @@ use Isotope\Frontend;
 use Isotope\Model\Document;
 use Isotope\Model\ProductCollection\Order;
 use Psr\Log\LogLevel;
+use ZipArchive;
 
 /**
- * Class DC_ProductCollectionTable.
+ * Class DocumentPrinter.
+ *
+ * @package MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection
  */
-class DC_ProductCollectionTable extends DC_Table {
+class DocumentPrinter {
 
     /**
      * The 'print all documents' form id.
@@ -32,14 +35,14 @@ class DC_ProductCollectionTable extends DC_Table {
      *
      * @var string
      */
-    protected const PRINT_ALL_DOCUMENTS_BUTTON_ID = 'print_all_documents';
+    public const PRINT_ALL_DOCUMENTS_BUTTON_ID = 'print_all_documents';
 
     /**
      * The 'print all documents' action name.
      *
      * @var string
      */
-    protected const PRINT_ALL_DOCUMENTS_ACTION_NAME = 'printAllDocuments';
+    public const PRINT_ALL_DOCUMENTS_ACTION_NAME = 'printAllDocuments';
 
     /**
      * The zip file name.
@@ -94,20 +97,11 @@ class DC_ProductCollectionTable extends DC_Table {
     protected $zipFileName;
 
     /**
-     * {@inheritdoc}.
+     * DocumentPrinter constructor.
      */
-    public function __construct($strTable, $arrModule = []) {
-        parent::__construct($strTable, $arrModule);
-
+    public function __construct() {
         $this->logger = System::getContainer()->get('monolog.logger.contao');
         $this->currentRequestUrl = Environment::get('request');
-
-        if (Input::post('FORM_SUBMIT') == 'tl_select') {
-            if (isset($_POST[self::PRINT_ALL_DOCUMENTS_BUTTON_ID])) {
-                // Replace default 'select' action with 'print' action.
-                $this->redirect(str_replace('act=select', 'act=' . self::PRINT_ALL_DOCUMENTS_ACTION_NAME, $this->currentRequestUrl));
-            }
-        }
     }
 
     /**
