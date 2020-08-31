@@ -1,7 +1,7 @@
 <?php
 
-use MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection\ButtonCallback;
-use MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection\DcaCallback;
+use MarcoSimbuerger\IsotopePrintMultipleDocumentsBundle\Backend\ProductCollection\ButtonCallback;
+use MarcoSimbuerger\IsotopePrintMultipleDocumentsBundle\Backend\ProductCollection\DcaCallback;
 
 // Calls the 'DC_TableExtension' of the 'contao-data-container-extension' module.
 $GLOBALS['TL_DCA']['tl_iso_product_collection']['config']['dataContainer'] = 'TableExtension';

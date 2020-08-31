@@ -1,13 +1,13 @@
 <?php
 
-namespace MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection;
+namespace MarcoSimbuerger\IsotopePrintMultipleDocumentsBundle\Backend\ProductCollection;
 
 use Contao\StringUtil;
 
 /**
  * Class ButtonCallback.
  *
- * @package MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection
+ * @package MarcoSimbuerger\IsotopePrintMultipleDocumentsBundle\Backend\ProductCollection
  */
 class ButtonCallback {
 

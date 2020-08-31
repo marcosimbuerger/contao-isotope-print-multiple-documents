@@ -1,6 +1,6 @@
 <?php
 
-namespace MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection;
+namespace MarcoSimbuerger\IsotopePrintMultipleDocumentsBundle\Backend\ProductCollection;
 
 use Contao\Backend;
 use Contao\DC_Table;
@@ -10,7 +10,7 @@ use Contao\Input;
 /**
  * Class DcaCallback.
  *
- * @package MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection
+ * @package MarcoSimbuerger\IsotopePrintMultipleDocumentsBundle\Backend\ProductCollection
  */
 class DcaCallback extends Backend {
 
@@ -32,7 +32,7 @@ class DcaCallback extends Backend {
         // Is available on the 'print all documents' page.
         if (Input::get('act') === DocumentPrinter::PRINT_ALL_DOCUMENTS_ACTION_NAME) {
             $dataContainer->{DocumentPrinter::PRINT_ALL_DOCUMENTS_ACTION_NAME} = function() {
-                /** @var \MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection\DocumentPrinter $documentPrinter */
+                /** @var \MarcoSimbuerger\IsotopePrintMultipleDocumentsBundle\Backend\ProductCollection\DocumentPrinter $documentPrinter */
                 $documentPrinter = new DocumentPrinter();
                 return $documentPrinter->printAllDocuments();
             };

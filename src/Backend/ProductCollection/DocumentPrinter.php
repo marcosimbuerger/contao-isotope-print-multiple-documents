@@ -1,6 +1,6 @@
 <?php
 
-namespace MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection;
+namespace MarcoSimbuerger\IsotopePrintMultipleDocumentsBundle\Backend\ProductCollection;
 
 use Contao\Controller;
 use Contao\CoreBundle\Monolog\ContaoContext;
@@ -19,7 +19,7 @@ use ZipArchive;
 /**
  * Class DocumentPrinter.
  *
- * @package MarcoSimbuerger\IsotopePrintMultipleDocuments\Backend\ProductCollection
+ * @package MarcoSimbuerger\IsotopePrintMultipleDocumentsBundle\Backend\ProductCollection
  */
 class DocumentPrinter {
 

@@ -21,11 +21,11 @@
         "contao/manager-plugin": "<2.0 || >=3.0"
     },
     "extra": {
-        "contao-manager-plugin": "MarcoSimbuerger\\IsotopePrintMultipleDocuments\\ContaoManager\\Plugin"
+        "contao-manager-plugin": "MarcoSimbuerger\\IsotopePrintMultipleDocumentsBundle\\ContaoManager\\Plugin"
     },
     "autoload": {
         "psr-4": {
-            "MarcoSimbuerger\\IsotopePrintMultipleDocuments\\": "src/"
+            "MarcoSimbuerger\\IsotopePrintMultipleDocumentsBundle\\": "src/"
         },
         "classmap": [
             "src/"
