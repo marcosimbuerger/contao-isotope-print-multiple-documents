@@ -1,0 +1,14 @@
+<?xml version="1.0" ?><xliff version="1.1">
+    <file datatype="php" source-language="en" target-language="de">
+        <body>
+            <trans-unit id="tl_iso_product_collection.print_all_documents.0">
+                <source>Print all selected documents</source>
+                <target>Alle ausgewählten Dokumente drucken.</target>
+            </trans-unit>
+            <trans-unit id="tl_iso_product_collection.print_all_documents.1">
+                <source></source>
+                <target></target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

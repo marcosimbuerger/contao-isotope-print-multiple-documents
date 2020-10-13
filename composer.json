@@ -2,6 +2,7 @@
     "name": "marcosimbuerger/contao-isotope-print-multiple-documents",
     "description": "Print functionality for multiple documents for Contao Isotope eCommerce.",
     "keywords": ["contao", "isotope", "ecommerce", "documents", "print", "multiple"],
+    "homepage": "https://github.com/marcosimbuerger/contao-isotope-print-multiple-documents",
     "type": "contao-bundle",
     "license": "LGPL-3.0-or-later",
     "authors": [
